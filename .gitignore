@@ -1,0 +1,42 @@
+*input.txt
+*test*.txt
+testdata*
+
+a.out*
+*.o
+bin/
+obj/
+
+.idea
+
+.DS_Store
+
+.config/
+.vscode/
+.ionide/
+.fake
+
+# Clojure
+.clj-kondo/
+.lsp/
+
+# OCaml
+_build/
+
+# Haskell
+*.hi
+
+# Crystal
+*.dwarf
+
+# Rust
+target/
+
+# Java
+*.class
+META-INF/
+
+# Scala 3
+*.tasty
+.bsp
+.metals
