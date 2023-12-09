@@ -6,5 +6,5 @@ You might want to also check out my previous attempts: [2022](https://github.com
 
 * Day 1: [Clojure](https://clojure.org/)
 * Day 2: [Awk](https://en.wikipedia.org/wiki/AWK)
-* Day 3: 
+* Day 3: [Zig](https://ziglang.org/)
 * Day 4: [Perl 5](https://www.perl.org/)
