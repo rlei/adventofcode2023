@@ -10,4 +10,5 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 4: [Perl 5](https://www.perl.org/)
 * Day 5:
 * Day 6: [Lua](https://www.lua.org/)
-* Day 7:
+* Day 7: [Common Lisp](https://lisp-lang.org/) (using [SBCL](http://www.sbcl.org/))
+* Day 8:
