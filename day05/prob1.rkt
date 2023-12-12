@@ -2,7 +2,7 @@
 
 (require racket/string)
 
-(define-struct range-mapping (to from size))
+(struct range-mapping (to from size))
 
 (define (compare-range-by-from r1 r2)
   (< (range-mapping-from r1) (range-mapping-from r2)))
@@ -15,7 +15,7 @@
           (range-mapping-size r)))
 
 (define (parse-range line)
-  (apply make-range-mapping (map string->number (string-split line " ")))
+  (apply range-mapping (map string->number (string-split line " ")))
 )
 
 ;; https://codereview.stackexchange.com/questions/87058/splitting-a-list-in-racket
