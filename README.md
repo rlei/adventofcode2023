@@ -11,4 +11,6 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 5: [Racket](https://racket-lang.org/)
 * Day 6: [Lua](https://www.lua.org/)
 * Day 7: [Common Lisp](https://lisp-lang.org/) (using [SBCL](http://www.sbcl.org/))
-* Day 8:
+* Day 8: [TypeScript](https://www.typescriptlang.org/) (using [Deno](https://deno.land/))
+* Day 9:
+* Day 10:
