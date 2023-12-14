@@ -13,4 +13,5 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 7: [Common Lisp](https://lisp-lang.org/) (using [SBCL](http://www.sbcl.org/))
 * Day 8: [TypeScript](https://www.typescriptlang.org/) (using [Deno](https://deno.land/))
 * Day 9: [OCaml](https://ocaml.org/)
-* Day 10:
+* Day 10: [Go](https://go.dev/)
+* Day 11:
