@@ -1,67 +1,61 @@
-count_springs(Line, Lengths) :-
-  split_string(Line, ".", ".", Groups),
-  % compare number of groups first to save the expensive string_length check
-  length(Groups, NumGroups),
-  length(Lengths, NumGroups),
-  maplist(string_length, Groups, Lengths).
-  % writeln([Line, Groups, Lengths]).
+% table match_pattern_to_counts/3.
 
-generate_springs([], []).
-generate_springs([InH|InTail], [OutH|OutTail]) :-
+match_first_springs([], [], _ , 0).
+match_first_springs([InH|_], [], _ , 0) :-
+  % complete the recursion if we've seen the right number of '#'s, AND the next
+  % one is NOT '#'. Otherwise terminate.
+  % writeln(["matched count, next ", InH]),
+  InH \= '#'.
+match_first_springs([InH|InTail], [OutH|OutTail], ExpectedSprings, SpringsToGo) :-
+  SpringsToGo > 0,
+  % writeln(["remaining ", InTail, "  springs to go ", SpringsToGo]),
   % if InH is '?', generate a sequence of '#' and '.' (with backtracking)
   % otherwise just copy to the output
   (InH = '?' -> member(OutH, ['#', '.']); OutH = InH),
-  generate_springs(InTail, OutTail).
+  (OutH = '#' ->
+    % writeln(["found a '#', remaining ", InTail]),
+    % recur
+    NewCount is SpringsToGo - 1,
+    match_first_springs(InTail, OutTail, ExpectedSprings, NewCount);
+    % --- else ---
+    % assert that we must haven't seen any spring '#' so far, otherwise terminate
+    % writeln(["not a '#', current springs to go ", SpringsToGo]),
+    ExpectedSprings = SpringsToGo,
+    % recur
+    match_first_springs(InTail, OutTail, ExpectedSprings, SpringsToGo)
+  ).
+
+match_first_springs_str(Pattern, Count, OutStr) :-
+  string_chars(Pattern, InputList),
+  match_first_springs(InputList, OutList, Count, Count),
+  % note this is from OutList to OutStr
+  string_chars(OutStr, OutList).
 
 match_pattern_to_counts(Pattern, [], Out) :-
   % writeln(["empty Counts pattern", Pattern]),
-  % check there's no '#' or '?'
+  % check there's no '#'
   string_chars(Pattern, Chars),
-  maplist(=('.'), Chars),
+  \+ member('#', Chars),
   Out=Pattern.
 match_pattern_to_counts(Pattern, [FirstCount|RestCounts], Out) :-
-  % writeln(["non empty Counts", FirstCount, RestCounts, Pattern]),
-  first_group_and_rest(Pattern, FirstPart, RestPattern),
-  % writeln(["first and rest ", FirstPart, " + ", RestPattern]),
-  generate_springs_str(FirstPart, Out1),
-  count_springs(Out1, [FirstCount]),
-  ((sub_string(Out1, _, 1, 0, "#"), sub_string(RestPattern, 0, 1, _, "?"))
+  match_first_springs_str(Pattern, FirstCount, MatchedPart),
+  string_length(MatchedPart, MatchedLen),
+  sub_string(Pattern, MatchedLen, _, 0, RestPattern),
+  % string_length(RestPattern, RestLen),
+  % sumlist(RestCounts, RestCountLen),
+  % RestLen >= RestCountLen,
+  % writeln(["first and rest ", MatchedPart, " + ", RestPattern]),
+  % if the next is '?', it must be expanded to '.'
+  (sub_string(RestPattern, 0, 1, _, "?")
    -> replace_first_char(RestPattern, '.', NewRest); NewRest = RestPattern),
-  % writeln("First part passed"),
-  % writeln(["Patterns", FirstPart, RestPattern]),
-  % writeln(["Counts and rest", FirstCount, RestCounts]),
-  % writeln(["Out1", Out1, NewRest]),
-  match_pattern_to_counts(NewRest, RestCounts, Out2),
-  string_concat(Out1, Out2, Out).
+  % writeln(["NewRest => ", NewRest]),
+  % writeln(["Counts and rest  => ", FirstCount, RestCounts]),
+  match_pattern_to_counts(NewRest, RestCounts, MatchedRest),
+  string_concat(MatchedPart, MatchedRest, Out).
 
 replace_first_char(In, Ch, Out) :-
   string_chars(In, [_|Rest]),
   string_chars(Out, [Ch|Rest]).
-
-first_group_and_rest(Pattern, Part1, Part2) :-
-  string_concat(Part1, Part2, Pattern),
-  % first group must not be empty
-  \+ string_length(Part1, 0),
-  % writeln(["split ", Pattern, " => ", Part1, " + ", Part2]),
-  % must not split consecutive springs
-  \+ (sub_string(Part1, _, 1, 0, "#"), sub_string(Part2, 0, 1, _, "#")),
-  no_more_than_one_spring_group(Part1).
-
-contains_spring(Str) :-
-  string_chars(Str, Chars),
-  member('#', Chars).
-
-no_more_than_one_spring_group(Pattern) :-
-  split_string(Pattern, ".", ".", Groups),
-  include(contains_spring, Groups, SpringGroups),
-  length(SpringGroups, Len),
-  Len =< 1.
-  
-generate_springs_str(Pattern, OutStr) :-
-  string_chars(Pattern, InputList),
-  generate_springs(InputList, OutList),
-  % note this is from OutList to OutStr now
-  string_chars(OutStr, OutList).
 
 count_matches(Pattern, ExpectedCounts, Matches) :-
   findall(Candidate,
