@@ -29,12 +29,12 @@ match_first_springs_str(Pattern, Count, ConsumedLen) :-
   string_chars(Pattern, InputList),
   match_first_springs(InputList, ConsumedLen, Count, Count).
 
-match_pattern_to_counts(Pattern, [], 0) :-
+match_pattern_to_counts(Pattern, []) :-
   % writeln(["empty Counts pattern", Pattern]),
   % check there's no '#'
   string_chars(Pattern, Chars),
   \+ member('#', Chars).
-match_pattern_to_counts(Pattern, [FirstCount|RestCounts], Out) :-
+match_pattern_to_counts(Pattern, [FirstCount|RestCounts]) :-
   match_first_springs_str(Pattern, FirstCount, MatchedLen),
   sub_string(Pattern, MatchedLen, _, 0, RestPattern),
   % string_length(RestPattern, RestLen),
@@ -46,17 +46,15 @@ match_pattern_to_counts(Pattern, [FirstCount|RestCounts], Out) :-
    -> replace_first_char(RestPattern, '.', NewRest); NewRest = RestPattern),
   % writeln(["NewRest => ", NewRest]),
   % writeln(["Counts and rest  => ", FirstCount, RestCounts]),
-  match_pattern_to_counts(NewRest, RestCounts, RestMatchedLen),
-  % writeln(["matched lengths => ", MatchedLen, RestMatchedLen]),
-  Out is MatchedLen + RestMatchedLen.
+  match_pattern_to_counts(NewRest, RestCounts).
 
 replace_first_char(In, Ch, Out) :-
   string_chars(In, [_|Rest]),
   string_chars(Out, [Ch|Rest]).
 
 count_matches(Pattern, ExpectedCounts, Matches) :-
-  findall(Candidate,
-         (match_pattern_to_counts(Pattern, ExpectedCounts, Candidate)),
+  findall(_,
+         (match_pattern_to_counts(Pattern, ExpectedCounts)),
          ValidCandidates),
   length(ValidCandidates, Matches),
   writeln(Matches).
@@ -76,7 +74,9 @@ count_matches_from_line_5x(Line, Matches) :-
   parse_line(Line, Pattern, Counts),
   repeat_and_join_string(Pattern, 5, '?', Pattern5x),
   repeat_list(Counts, 5, Counts5x),
-  count_matches(Pattern5x, Counts5x, Matches).
+  writeln(["Counting => ", Line]),
+  count_matches(Pattern5x, Counts5x, Matches),
+  writeln(["Counting <= ", Line, " ", Matches]).
 
 repeat_and_join_string(Str, Times, Sep, Result) :- 
     findall(Str, between(1, Times, _), Strs),
@@ -88,7 +88,7 @@ repeat_list(List, Times, Result) :-
 
 prob2 :-
   read_lines(user_input, Lines),
-  maplist(count_matches_from_line_5x, Lines, AllMatches),
+  concurrent_maplist(count_matches_from_line_5x, Lines, AllMatches),
   sumlist(AllMatches, Sum),
   write("Sum of counts: "),
   writeln(Sum).
