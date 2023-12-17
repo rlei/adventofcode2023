@@ -1,11 +1,12 @@
-match_first_springs([], 0, _ , 0).
-match_first_springs([InH|_], 0, _ , 0) :-
+% table match_pattern_to_counts/3.
+
+match_first_springs([], [], _ , 0).
+match_first_springs([InH|_], [], _ , 0) :-
   % complete the recursion if we've seen the right number of '#'s, AND the next
   % one is NOT '#'. Otherwise terminate.
   % writeln(["matched count, next ", InH]),
   InH \= '#'.
-  % writeln("matched!!").
-match_first_springs([InH|InTail], ConsumedLen, ExpectedSprings, SpringsToGo) :-
+match_first_springs([InH|InTail], [OutH|OutTail], ExpectedSprings, SpringsToGo) :-
   SpringsToGo > 0,
   % writeln(["remaining ", InTail, "  springs to go ", SpringsToGo]),
   % if InH is '?', generate a sequence of '#' and '.' (with backtracking)
@@ -15,27 +16,30 @@ match_first_springs([InH|InTail], ConsumedLen, ExpectedSprings, SpringsToGo) :-
     % writeln(["found a '#', remaining ", InTail]),
     % recur
     NewCount is SpringsToGo - 1,
-    match_first_springs(InTail, TailLen, ExpectedSprings, NewCount);
+    match_first_springs(InTail, OutTail, ExpectedSprings, NewCount);
     % --- else ---
     % assert that we must haven't seen any spring '#' so far, otherwise terminate
     % writeln(["not a '#', current springs to go ", SpringsToGo]),
     ExpectedSprings = SpringsToGo,
     % recur
-    match_first_springs(InTail, TailLen, ExpectedSprings, SpringsToGo)
-  ),
-  ConsumedLen is TailLen + 1.
+    match_first_springs(InTail, OutTail, ExpectedSprings, SpringsToGo)
+  ).
 
-match_first_springs_str(Pattern, Count, ConsumedLen) :-
+match_first_springs_str(Pattern, Count, OutStr) :-
   string_chars(Pattern, InputList),
-  match_first_springs(InputList, ConsumedLen, Count, Count).
+  match_first_springs(InputList, OutList, Count, Count),
+  % note this is from OutList to OutStr
+  string_chars(OutStr, OutList).
 
-match_pattern_to_counts(Pattern, [], 0) :-
+match_pattern_to_counts(Pattern, [], Out) :-
   % writeln(["empty Counts pattern", Pattern]),
   % check there's no '#'
   string_chars(Pattern, Chars),
-  \+ member('#', Chars).
+  \+ member('#', Chars),
+  Out=Pattern.
 match_pattern_to_counts(Pattern, [FirstCount|RestCounts], Out) :-
-  match_first_springs_str(Pattern, FirstCount, MatchedLen),
+  match_first_springs_str(Pattern, FirstCount, MatchedPart),
+  string_length(MatchedPart, MatchedLen),
   sub_string(Pattern, MatchedLen, _, 0, RestPattern),
   % string_length(RestPattern, RestLen),
   % sumlist(RestCounts, RestCountLen),
@@ -46,9 +50,8 @@ match_pattern_to_counts(Pattern, [FirstCount|RestCounts], Out) :-
    -> replace_first_char(RestPattern, '.', NewRest); NewRest = RestPattern),
   % writeln(["NewRest => ", NewRest]),
   % writeln(["Counts and rest  => ", FirstCount, RestCounts]),
-  match_pattern_to_counts(NewRest, RestCounts, RestMatchedLen),
-  % writeln(["matched lengths => ", MatchedLen, RestMatchedLen]),
-  Out is MatchedLen + RestMatchedLen.
+  match_pattern_to_counts(NewRest, RestCounts, MatchedRest),
+  string_concat(MatchedPart, MatchedRest, Out).
 
 replace_first_char(In, Ch, Out) :-
   string_chars(In, [_|Rest]),
