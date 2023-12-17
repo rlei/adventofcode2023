@@ -10,7 +10,7 @@ match_first_springs([InH|InTail], ConsumedLen, ExpectedSprings, SpringsToGo) :-
   % writeln(["remaining ", InTail, "  springs to go ", SpringsToGo]),
   % if InH is '?', generate a sequence of '#' and '.' (with backtracking)
   % otherwise just copy to the output
-  (InH = '?' -> member(OutH, ['#', '.']); OutH = InH),
+  (InH = '?' -> (OutH = '#'; OutH = '.'); OutH = InH),
   (OutH = '#' ->
     % writeln(["found a '#', remaining ", InTail]),
     % recur
@@ -41,9 +41,9 @@ match_pattern_to_counts(Pattern, [FirstCount|RestCounts]) :-
   % sumlist(RestCounts, RestCountLen),
   % RestLen >= RestCountLen,
   % writeln(["first and rest ", MatchedPart, " + ", RestPattern]),
-  % if the next is '?', it must be expanded to '.'
+  % if the next is '?', it must only be expanded to '.', so just skip it
   (sub_string(RestPattern, 0, 1, _, "?")
-   -> replace_first_char(RestPattern, '.', NewRest); NewRest = RestPattern),
+   -> sub_string(RestPattern, 1, _, 0, NewRest); NewRest = RestPattern),
   % writeln(["NewRest => ", NewRest]),
   % writeln(["Counts and rest  => ", FirstCount, RestCounts]),
   match_pattern_to_counts(NewRest, RestCounts).
@@ -53,10 +53,9 @@ replace_first_char(In, Ch, Out) :-
   string_chars(Out, [Ch|Rest]).
 
 count_matches(Pattern, ExpectedCounts, Matches) :-
-  findall(_,
+  aggregate(count,
          (match_pattern_to_counts(Pattern, ExpectedCounts)),
-         ValidCandidates),
-  length(ValidCandidates, Matches),
+         Matches),
   writeln(Matches).
 
 read_lines(Stream, []) :- at_end_of_stream(Stream).
