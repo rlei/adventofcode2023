@@ -1,9 +1,11 @@
 match_first_springs([], 0, _ , 0).
-match_first_springs([InH|_], 0, _ , 0) :-
+match_first_springs([InH|_], ConsumedLen, _ , 0) :-
   % complete the recursion if we've seen the right number of '#'s, AND the next
   % one is NOT '#'. Otherwise terminate.
   % writeln(["matched count, next ", InH]),
-  InH \= '#'.
+  InH \= '#',
+  % if the next is '?', it must only be expanded to '.', so just skip it
+  (InH = '?' -> ConsumedLen is 1; ConsumedLen is 0).
   % writeln("matched!!").
 match_first_springs([InH|InTail], ConsumedLen, ExpectedSprings, SpringsToGo) :-
   SpringsToGo > 0,
@@ -29,32 +31,32 @@ match_first_springs_str(Pattern, Count, ConsumedLen) :-
   string_chars(Pattern, InputList),
   match_first_springs(InputList, ConsumedLen, Count, Count).
 
-match_pattern_to_counts(Pattern, []) :-
+match_pattern_to_counts(Pattern, _, []) :-
   % writeln(["empty Counts pattern", Pattern]),
   % check there's no '#'
   string_chars(Pattern, Chars),
   \+ member('#', Chars).
-match_pattern_to_counts(Pattern, [FirstCount|RestCounts]) :-
+match_pattern_to_counts(Pattern, MinPatternLen, [FirstCount|RestCounts]) :-
+  string_length(Pattern, Len),
+  Len >= MinPatternLen,
   match_first_springs_str(Pattern, FirstCount, MatchedLen),
-  sub_string(Pattern, MatchedLen, _, 0, RestPattern),
+  % sub_string(Pattern, MatchedLen, _, 0, RestPattern),
+
   % string_length(RestPattern, RestLen),
   % sumlist(RestCounts, RestCountLen),
   % RestLen >= RestCountLen,
   % writeln(["first and rest ", MatchedPart, " + ", RestPattern]),
-  % if the next is '?', it must only be expanded to '.', so just skip it
-  (sub_string(RestPattern, 0, 1, _, "?")
-   -> sub_string(RestPattern, 1, _, 0, NewRest); NewRest = RestPattern),
-  % writeln(["NewRest => ", NewRest]),
+  sub_string(Pattern, MatchedLen, _, 0, RestPattern),
+  RestMinLen is MinPatternLen - FirstCount - 1,
   % writeln(["Counts and rest  => ", FirstCount, RestCounts]),
-  match_pattern_to_counts(NewRest, RestCounts).
-
-replace_first_char(In, Ch, Out) :-
-  string_chars(In, [_|Rest]),
-  string_chars(Out, [Ch|Rest]).
+  match_pattern_to_counts(RestPattern, RestMinLen, RestCounts).
 
 count_matches(Pattern, ExpectedCounts, Matches) :-
+  sumlist(ExpectedCounts, NumSprings),
+  length(ExpectedCounts, NumGroups),
+  MinPatternLen is NumSprings + NumGroups - 1,
   aggregate(count,
-         (match_pattern_to_counts(Pattern, ExpectedCounts)),
+         (match_pattern_to_counts(Pattern, MinPatternLen, ExpectedCounts)),
          Matches),
   writeln(Matches).
 
