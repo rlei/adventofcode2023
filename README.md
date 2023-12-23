@@ -16,4 +16,5 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 10: [Go](https://go.dev/)
 * Day 11: [D](https://dlang.org/)
 * Day 12: [Prolog](https://en.wikipedia.org/wiki/Prolog) (using [SWI Prolog](https://www.swi-prolog.org/))
-* Day 13:
+* Day 13: [Python 3](https://www.python.org/)
+* Day 14:
