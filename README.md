@@ -17,7 +17,7 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 11: [D](https://dlang.org/)
 * Day 12: [Prolog](https://en.wikipedia.org/wiki/Prolog) (using [SWI Prolog](https://www.swi-prolog.org/))
 * Day 13: [Python 3](https://www.python.org/)
-* Day 14:
+* Day 14: [Crystal](https://crystal-lang.org/)
 * Day 15: [Idris 2](https://www.idris-lang.org/)
 * Day 16:
 * Day 17:
