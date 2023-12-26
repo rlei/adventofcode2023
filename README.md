@@ -21,3 +21,7 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 15: [Idris 2](https://www.idris-lang.org/)
 * Day 16:
 * Day 17:
+* Day 18:
+* Day 19: [Haskell](https://www.haskell.org/)
+* Day 20:
+* Day 21:
