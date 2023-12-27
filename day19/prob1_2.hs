@@ -68,12 +68,16 @@ programParser = do
 type WorkflowMap = Map.Map String [RuleOrNext]
 type RatingMap = Map.Map String Int
 
+-- | AoC input is always valid
+mustGet :: forall k a. Ord k => k -> Map.Map k a -> a
+mustGet key m = fromJust $ Map.lookup key m
+
 applyRule :: RatingMap -> String -> RuleOrNext -> String
 -- if the last rule output is empty, apply this one
 applyRule partRatings "" rule =
   case rule of
     Left Rule {partName = partName, op = op, number = number, nextWfName = wfName} ->
-      let rating = fromJust $ Map.lookup partName partRatings in
+      let rating = mustGet partName partRatings in
       case op of
         '<' -> if rating < number then wfName else ""
         '>' -> if rating > number then wfName else ""
@@ -83,7 +87,7 @@ applyRule _ wfName _ = wfName
 
 applyWorkflow :: WorkflowMap -> String -> Part -> Maybe Int
 applyWorkflow wfMap wfName part =
-  let wfRules = fromJust $ Map.lookup wfName wfMap
+  let wfRules = mustGet wfName wfMap
       Part partRatings partScore = part in
   case (foldl (applyRule partRatings) "" wfRules) of
     "A" -> Just partScore
@@ -95,12 +99,10 @@ type Range = (Int, Int)
 type RangesMap = (Map.Map String [Range])
 
 sumRanges :: [Range] -> Int
-sumRanges ranges =
-  sum $ map (\r -> (snd r) - (fst r) + 1) ranges
+sumRanges ranges = sum $ map (\(lower, upper) -> upper - lower + 1) ranges
 
 combinationsFromRanges :: [[Range]] -> Int
-combinationsFromRanges rangesList =
-  product $ map sumRanges rangesList
+combinationsFromRanges rangesList = product $ map sumRanges rangesList
 
 -- | returns matched and not matched ranges
 splitRanges :: [Range] -> Char -> Int -> ([Range], [Range])
@@ -127,23 +129,17 @@ applyRules :: RangesMap -> WorkflowMap -> [RuleOrNext] -> Int
 applyRules rangesMap wfMap (rule:restRules) =
   case rule of
     Left Rule {partName = partName, op = op, number = number, nextWfName = nextWfName} ->
-      let ranges = fromJust $ Map.lookup partName rangesMap
+      let ranges = mustGet partName rangesMap
           (matched, notMatched) = splitRanges ranges op number
           matchedRangesMap = Map.insert partName matched rangesMap
           notMatchedRangesMap = Map.insert partName notMatched rangesMap in
             (combinations matchedRangesMap wfMap nextWfName) + (applyRules notMatchedRangesMap wfMap restRules)
-    Right nextWfName ->
-      case nextWfName of
-        "A" -> combinationsFromRanges $ Map.elems rangesMap
-        "R" -> 0
-        nextWf -> combinations rangesMap wfMap nextWfName
+    Right nextWfName -> combinations rangesMap wfMap nextWfName
 
 combinations :: RangesMap -> WorkflowMap -> String -> Int
 combinations _ _ "R" = 0
 combinations partRanges _ "A" = combinationsFromRanges $ Map.elems partRanges
-combinations partRanges wfMap wfName =
-  let wfRules = fromJust $ Map.lookup wfName wfMap in
-  applyRules partRanges wfMap wfRules
+combinations partRanges wfMap wfName = applyRules partRanges wfMap (mustGet wfName wfMap)
 
 main :: IO ()
 main = do
