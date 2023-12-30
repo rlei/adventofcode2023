@@ -20,7 +20,7 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 14: [Crystal](https://crystal-lang.org/)
 * Day 15: [Idris 2](https://www.idris-lang.org/)
 * Day 16:
-* Day 17:
+* Day 17: [C++](https://en.wikipedia.org/wiki/C%2B%2B) ([C++ 20](https://en.cppreference.com/w/cpp/20))
 * Day 18:
 * Day 19: [Haskell](https://www.haskell.org/)
 * Day 20:

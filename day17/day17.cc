@@ -60,7 +60,7 @@ constexpr bool isValidPos (const Map2D<int>& map, const Pos& pos) {
     return row >= 0 && row < map.size() && col >= 0 && col < map[0].size();
 };
 
-int dijkstra_last_3(const Map2D<int>& map) {
+int dijkstra(const Map2D<int>& map, int minStepsAfterTurn, int maxStepsBeforeTurn) {
     std::priority_queue<LossAndPos, std::deque<LossAndPos>, std::greater<LossAndPos>> pq;
 
     const int rows = map.size();
@@ -85,27 +85,33 @@ int dijkstra_last_3(const Map2D<int>& map) {
         const auto [lastMoveY, lastMoveX]= lastMove;
         forbiddenMoves.push_back(Move(-lastMoveY, -lastMoveX));
         // must turn
-        if (count >= 3) {
+        if (count >= maxStepsBeforeTurn) {
             forbiddenMoves.push_back(lastMove);
         }
 
-        auto addToPos = std::bind(operator+, pos, std::placeholders::_1);
-        auto checkValidPos = std::bind(isValidPos, map, std::placeholders::_1);
-        auto nextPositions = possible_moves
+        auto nextMoves = possible_moves
             | std::views::filter([&forbiddenMoves](const Pos& p)
-                { return std::find(forbiddenMoves.begin(), forbiddenMoves.end(), p) == forbiddenMoves.end(); })
-            | std::views::transform(addToPos)
-            | std::views::filter(checkValidPos);
+                { return std::find(forbiddenMoves.begin(), forbiddenMoves.end(), p) == forbiddenMoves.end(); });
 
-        for (auto next : nextPositions) {
-            // std::cout << "next " << next << std::endl;
-            const auto [row, col] = next;
-            const auto newLoss = loss + map[row][col];
-            const auto move = next - pos;
+        for (auto move : nextMoves) {
+            auto steps = (move != lastMove) ? minStepsAfterTurn : 1;
+            const auto [dr, dc] = move;
+            if (!isValidPos(map, pos + Move{dr * steps, dc * steps})) {
+                continue;
+            }
 
-            auto nextMoveAndCount = addMove(lastMoveAndCount, move);
+            auto next = pos;
+            auto newLoss = loss;
+            auto nextMoveAndCount = lastMoveAndCount;
+            for (; steps > 0; steps--) {
+                next = next + move;
+                const auto [row, col] = next;
+                newLoss = newLoss + map[row][col];
+                nextMoveAndCount = addMove(nextMoveAndCount, move);
+            }
 
             if (!visited.contains({next, nextMoveAndCount})) {
+                const auto [row, col] = next;
                 if (!moves_loss_map[row][col].contains(nextMoveAndCount) || newLoss < moves_loss_map[row][col][nextMoveAndCount]) {
                     moves_loss_map[row][col][nextMoveAndCount] = newLoss;
                     pq.push(LossAndPos(newLoss, next, nextMoveAndCount));
@@ -135,6 +141,7 @@ int main() {
     // start pos is considered 0
     map[0][0] = 0;
 
-    std::cout << "Min: " << dijkstra_last_3(map) << std::endl;
+    std::cout << "#1: " << dijkstra(map, 1 , 3) << std::endl;
+    std::cout << "#2: " << dijkstra(map, 4 , 10) << std::endl;
     return 0;
 }
