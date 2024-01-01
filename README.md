@@ -24,5 +24,6 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 18:
 * Day 19: [Haskell](https://www.haskell.org/)
 * Day 20:
-* Day 21:
+* Day 21: [Lean 4](https://github.com/leanprover/lean4)
 * Day 22:
+* Day 23:
