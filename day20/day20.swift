@@ -14,6 +14,8 @@ protocol Module {
     func signal(pulse: Pulse, from: String)
 
     func process() -> [PulseOnBus]
+
+    func reset()
 }
 
 extension Module {
@@ -38,6 +40,8 @@ class Broadcaster: Module {
     func process() -> [PulseOnBus] {
         self.deliverSignal(.low)
     }
+
+    func reset() {}
 }
 
 // Classes are reference types in Swift, while structs value types.
@@ -73,6 +77,11 @@ class FlipFlop: Module {
         }
         return []
     }
+
+    func reset() {
+        on = false
+        flipped = false
+    }
 }
 
 class Conjunction: Module {
@@ -93,6 +102,10 @@ class Conjunction: Module {
     func process() -> [PulseOnBus] {
         deliverSignal(inputRegisters.allSatisfy { $0.value == .high } ? .low : .high)
     }
+
+    func reset() {
+        inputRegisters = inputRegisters.mapValues { _ in .low }
+    }
 }
 
 class Dummy: Module {
@@ -112,6 +125,7 @@ class Dummy: Module {
         []
     }
 
+    func reset() {}
 }
 
 func buildModules() -> [String: Module] {
@@ -168,7 +182,7 @@ var modules = buildModules()
 var lowPulses = 0
 var highPulses = 0
 
-for i in 1...1000 {
+for _ in 1...1000 {
     var signalBus = [PulseOnBus(.low, "button", "broadcaster")]
 
     while !signalBus.isEmpty {
@@ -176,9 +190,6 @@ for i in 1...1000 {
         lowPulses += pulse == .low ? 1 : 0
         highPulses += pulse == .high ? 1 : 0
     
-        if to == "rx" && pulse == .low {
-            print("rx got low pulse on \(i) presses\n")
-        }
         let toModule = modules[to]!
         toModule.signal(pulse: pulse, from: from)
         let created = toModule.process()
@@ -189,3 +200,36 @@ for i in 1...1000 {
 }
 
 print("low: \(lowPulses) x high \(highPulses) = \(lowPulses * highPulses)\n")
+
+// part 2
+modules.forEach { (_, module) in module.reset() }
+
+// all modules that output to "lg" which outputs to "rx"
+var allFactors = modules.filter { (name, module) in module.outputs.contains("lg") }
+    .mapValues { _ in 0 }
+
+var presses = 0
+outer: while true {
+    var signalBus = [PulseOnBus(.low, "button", "broadcaster")]
+    presses += 1
+
+    while !signalBus.isEmpty {
+        let (pulse, from, to) = signalBus.removeFirst()
+    
+        if to == "lg" && pulse == .high {
+            if allFactors[from]! == 0 {
+                allFactors[from] = presses
+            }
+            print("\(from) \(pulse) => \(to) @ \(presses)")
+            if allFactors.allSatisfy({ (_, factor) in factor != 0 }) {
+                print("min steps to trigger lg/rx: \(allFactors.values.reduce(1, *))")
+                break outer
+            }
+        }
+        let toModule = modules[to]!
+        toModule.signal(pulse: pulse, from: from)
+        let created = toModule.process()
+        // debugPrint(created, terminator: "\n")
+        signalBus.append(contentsOf: created)
+    }
+}
