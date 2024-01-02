@@ -21,10 +21,11 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 15: [Idris 2](https://www.idris-lang.org/)
 * Day 16: [C#](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12)
 * Day 17: [C++](https://en.wikipedia.org/wiki/C%2B%2B) ([C++ 20](https://en.cppreference.com/w/cpp/20))
-* Day 18:
+* Day 18: [Nim](https://nim-lang.org/)
 * Day 19: [Haskell](https://www.haskell.org/)
 * Day 20: [Swift](https://developer.apple.com/swift/)
 * Day 21: [Lean 4](https://github.com/leanprover/lean4)
 * Day 22:
 * Day 23:
 * Day 24:
+* Day 25:
