@@ -100,13 +100,10 @@ let (finalRow, finalCol) = currPos
 if finalRow != 0 or finalCol != 0:
     raise newException(ValueError, "Not a closed shape")
 
-let allRows = sorted(toSeq(rowToCols.keys))
-
 var sum = 0
-for row in allRows:
-    let cols = sorted(rowToCols[row])
+for row, cols in rowToCols:
     let startState: FoldState = (inside: false, acc: 0, lastShape: '.', lastCol: -1)
-    let (_, covered, _, _) = foldl(cols, walkInOrOut(a, row, b), startState)
+    let (_, covered, _, _) = foldl(sorted(cols), walkInOrOut(a, row, b), startState)
     sum += covered
     # echo fmt"covered {covered} at row {row}"
 

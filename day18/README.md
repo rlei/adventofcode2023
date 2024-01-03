@@ -22,4 +22,4 @@ Similarly,
 
 `nim c -d:release -r prob2.nim < path/to/input_data`
 
-p.s: I'm too lazy to optimize it further - it will take about 2GB RAM and 20-30 secs, give or take.
+p.s: I'm too lazy to optimize it further - it will take about 2GB RAM and 15-25 secs.
