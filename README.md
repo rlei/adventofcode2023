@@ -27,5 +27,5 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 21: [Lean 4](https://github.com/leanprover/lean4)
 * Day 22:
 * Day 23:
-* Day 24:
+* Day 24: [Julia](https://julialang.org/)
 * Day 25:
