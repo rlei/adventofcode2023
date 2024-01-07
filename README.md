@@ -26,6 +26,6 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 20: [Swift](https://developer.apple.com/swift/)
 * Day 21: [Lean 4](https://github.com/leanprover/lean4)
 * Day 22: [Scala 3](https://www.scala-lang.org/)
-* Day 23:
+* Day 23: [Rust](https://www.rust-lang.org/)
 * Day 24: [Julia](https://julialang.org/)
 * Day 25:
