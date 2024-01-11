@@ -28,4 +28,4 @@ You might want to also check out my previous attempts: [2022](https://github.com
 * Day 22: [Scala 3](https://www.scala-lang.org/)
 * Day 23: [Rust](https://www.rust-lang.org/)
 * Day 24: [Julia](https://julialang.org/)
-* Day 25:
+* Day 25: [Kotlin](https://kotlinlang.org/)
